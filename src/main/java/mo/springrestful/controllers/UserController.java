@@ -1,5 +1,6 @@
 package mo.springrestful.controllers;
 
+import mo.springrestful.exceptions.UserNotFoundException;
 import mo.springrestful.models.User;
 import mo.springrestful.services.UserDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +24,18 @@ public class UserController {
 
     @GetMapping("/users/{id}")
     public User retrieveUser(@PathVariable int id) {
-        return userDaoService.findOne(id);
+
+        User user = userDaoService.findOne(id);
+        if (user == null)
+            throw new UserNotFoundException("id = "+id);
+        return user;
     }
 
 
 
     @PostMapping("/users")
     public ResponseEntity<Object> createUser(@RequestBody User user) {
+
         User save = userDaoService.save(user);
 
         URI Location = ServletUriComponentsBuilder
