@@ -1,13 +1,17 @@
 package mo.springrestful.models;
 
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 public class User {
 
     private Integer id;
 
+    @Size(min = 2,message = "you should enter name at least contain 2 character")
     private String name;
 
+    @Past
     private Date birthDate;
 
     @Override
