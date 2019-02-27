@@ -4,6 +4,8 @@ import mo.springrestful.exceptions.UserNotFoundException;
 import mo.springrestful.models.User;
 import mo.springrestful.services.UserDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -24,12 +26,20 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    public User retrieveUser(@PathVariable int id) {
+    public Resource<User> retrieveUser(@PathVariable int id) {
 
         User user = userDaoService.findOne(id);
         if (user == null)
             throw new UserNotFoundException("id = "+id);
-        return user;
+
+        Resource<User> userResource = new Resource<>(user);
+        ControllerLinkBuilder linkBuilder = ControllerLinkBuilder.linkTo(ControllerLinkBuilder
+                .methodOn(this.getClass())
+                .retrieveAllUsers()
+        );
+        userResource.add(linkBuilder.slash(user.getId()).withSelfRel());
+        userResource.add(linkBuilder.withRel("all-users"));
+        return userResource;
     }
 
 
