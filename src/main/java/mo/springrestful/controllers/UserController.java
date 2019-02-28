@@ -1,12 +1,17 @@
 package mo.springrestful.controllers;
 
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import mo.springrestful.exceptions.UserNotFoundException;
 import mo.springrestful.models.User;
 import mo.springrestful.services.UserDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -66,6 +71,43 @@ public class UserController {
 
         if (user == null)
             throw new UserNotFoundException("id = "+id);
+    }
+
+
+    @GetMapping("/users/filter/{name}/{id}")
+    public MappingJacksonValue retrieveUserAfterFiltering(@PathVariable String name,@PathVariable int id) {
+
+        User user = userDaoService.findOne(id);
+        if (user == null)
+            throw new UserNotFoundException("id = "+id);
+
+        SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.filterOutAllExcept(name);
+        FilterProvider filterProvider = new SimpleFilterProvider().addFilter("GetSpecialField",simpleBeanPropertyFilter);
+        MappingJacksonValue map = new MappingJacksonValue(user);
+        map.setFilters(filterProvider);
+        Resource<MappingJacksonValue> userResource = new Resource<>(map);
+        ControllerLinkBuilder linkBuilder = ControllerLinkBuilder.linkTo(ControllerLinkBuilder
+                .methodOn(this.getClass())
+                .retrieveAllUsersAfterFiltering(name)
+        );
+        userResource.add(linkBuilder.slash(user.getId()).withSelfRel());
+        userResource.add(linkBuilder.withRel("all-users"));
+        List<Link> link = userResource.getLinks();
+        System.out.println(link.get(0).toString());
+        System.out.println(link.get(1).toString());
+        return map;
+    }
+
+    @GetMapping("/users/filter/{name}")
+    public MappingJacksonValue retrieveAllUsersAfterFiltering(@PathVariable String name) {
+        List<User> list = userDaoService.findAll();
+        SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.
+                filterOutAllExcept(name.toLowerCase());
+        FilterProvider filterProvider = new SimpleFilterProvider()
+                .addFilter("GetSpecialField",simpleBeanPropertyFilter);
+        MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(list);
+        mappingJacksonValue.setFilters(filterProvider);
+        return mappingJacksonValue;
     }
 
 

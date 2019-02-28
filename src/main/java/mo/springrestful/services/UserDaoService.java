@@ -31,7 +31,7 @@ public class UserDaoService{
         users.add(user);
         System.out.println(user.getName());
         System.out.println(user.getId());
-        System.out.println(user.getBirthDate());
+        System.out.println(user.getBirthday());
         return user;
     }
 

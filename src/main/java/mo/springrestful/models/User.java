@@ -1,9 +1,12 @@
 package mo.springrestful.models;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
+@JsonFilter("GetSpecialField")
 public class User {
 
     private Integer id;
@@ -12,22 +15,22 @@ public class User {
     private String name;
 
     @Past
-    private Date birthDate;
+    private Date birthday;
 
     @Override
     public String toString() {
-        return "User [id=" + id + ", name=" + name + ", birthDate=" + birthDate + "]";
+        return "User [id=" + id + ", name=" + name + ", birthday=" + birthday + "]";
     }
 
     public User() {
     }
 
 
-    public User(Integer id, String name, Date birthDate) {
+    public User(Integer id, String name, Date birthday) {
         super();
         this.id = id;
         this.name = name;
-        this.birthDate = birthDate;
+        this.birthday = birthday;
     }
 
     public Integer getId() {
@@ -46,14 +49,11 @@ public class User {
         this.name = name;
     }
 
-    public Date getBirthDate() {
-        return birthDate;
+    public Date getBirthday() {
+        return birthday;
     }
 
-    public void setBirthDate(Date birthDate) {
-        this.birthDate = birthDate;
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
     }
-
-
-
 }
