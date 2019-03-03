@@ -1,14 +1,18 @@
 package mo.springrestful.models;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
-
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
-@JsonFilter("GetSpecialField")
+//@JsonFilter("GetSpecialField")
+@Entity
 public class User {
 
+    @Id
+    @GeneratedValue
     private Integer id;
 
     @Size(min = 2,message = "you should enter name at least contain 2 character")
